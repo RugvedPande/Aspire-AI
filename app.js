@@ -389,9 +389,7 @@ function init() {
     loadChat(chats[0].id);
   }
   
-  if (!apiKey) {
-    openSettings();
-  }
+  
   setupEventListeners();
 }
 
@@ -825,11 +823,7 @@ function removeFilePreview() {
 async function handleSendMessage(e) {
   e.preventDefault();
   
-  if (!apiKey) {
-    openSettings();
-    alert("Please enter a Gemini API Key first.");
-    return;
-  }
+  
   const text = messageInput.value.trim();
   const baseUiText = text || (currentFileParsedText ? "[Attached Document]" : "");
   if (!baseUiText && !currentImageBase64) return;
