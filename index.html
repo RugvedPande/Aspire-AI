@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aspire AI</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- KaTeX for Mathematics -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" crossorigin="anonymous"></script>
+  
+  <!-- Markdown Parsers and KaTeX extension -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked-katex-extension/lib/index.umd.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+  
+  <!-- Document Parsers & Charting -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="https://unpkg.com/mammoth@1.4.2/mammoth.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <img src="logo.png" alt="Aspire AI" style="width: 24px; height: 24px; border-radius: 4px; object-fit: cover;">
+          <h2>Aspire AI</h2>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button id="new-chat-btn" class="icon-btn primary-soft" title="New Conversation">
+            <i data-lucide="plus"></i>
+          </button>
+          <button id="new-trade-chat-btn" class="icon-btn trade-soft" title="New Trade Mode Chat" style="background:rgba(16,185,129,0.15); color:#10B981; border:1px solid rgba(16,185,129,0.3);">
+            <i data-lucide="trending-up"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="chat-history" id="chat-history">
+        <!-- History items injected by app.js -->
+      </div>
+      
+      <div class="sidebar-footer">
+        <button id="settings-btn" class="settings-btn">
+          <i data-lucide="settings"></i> 
+          <span>Settings</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Chat Area -->
+    <main class="chat-area">
+      <header class="chat-header">
+        <div class="mobile-toggle">
+          <button id="toggle-sidebar" class="icon-btn"><i data-lucide="menu"></i></button>
+        </div>
+        <h3 id="current-chat-title" style="flex:1;">New Conversation</h3>
+        
+        <div id="chat-mode-badge" style="display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:4px 12px; border-radius:12px; font-size:0.8rem; font-weight:500; color:var(--text-muted);">
+          <i data-lucide="message-square" style="width:14px; height:14px;"></i> <span id="mode-badge-text">Standard AI Mode</span>
+        </div>
+      </header>
+      <div class="main-content-wrapper" id="main-content-wrapper">
+        <!-- Dashboard Panel -->
+        <div id="trading-dashboard" class="hidden trading-dashboard"></div>
+        
+        <!-- Chat Column -->
+        <div id="chat-column" class="chat-column">
+          <div class="messages-container" id="messages-container">
+        <div class="welcome-screen" id="welcome-screen">
+          <!-- Ambient Lights -->
+          <div class="ambient-blob blob-1"></div>
+          <div class="ambient-blob blob-2"></div>
+          
+          <!-- Content -->
+          <div class="welcome-content">
+            <div style="margin-bottom: 20px;">
+              <img src="logo.png" alt="Aspire AI" style="width: 80px; height: 80px; border-radius: 50%; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4); object-fit: cover;">
+            </div>
+            <h1 id="welcome-title"><span class="cursive-brand">Aspire</span>. Then Brainstorm</h1>
+            <p>I am Aspire AI. You can ask me questions, upload images for analysis, or just have a chat.</p>
+          </div>
+        </div>
+        <!-- Chat bubbles injected by app.js -->
+      </div>
+
+      <div class="input-area">
+        <div id="reply-preview-container" class="hidden reply-preview">
+          <div class="reply-preview-content">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 17 4 12 9 7"></polyline><path d="M20 18v-2a4 4 0 0 0-4-4H4"></path></svg>
+            <span id="reply-preview-text"></span>
+          </div>
+          <button id="cancel-reply-btn" class="icon-btn" title="Cancel Reply">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+        <div class="input-wrapper">
+          <div id="image-preview-container" class="hidden image-preview-container">
+            <div class="img-wrap">
+              <div id="file-ext-badge" class="hidden" style="position:absolute; inset:0; background:#3B82F6; color:white; display:flex; align-items:center; justify-content:center; border-radius:8px; font-weight:bold; font-size:12px;">DOC</div>
+              <img id="image-preview" src="" alt="Preview"/>
+              <button id="remove-image" class="remove-btn"><i data-lucide="x" size="14"></i></button>
+            </div>
+            <div id="upload-status" class="hidden" style="font-size: 0.8rem; color: var(--text-muted); align-self: center;">Extracting text...</div>
+          </div>
+          <form id="chat-form" class="chat-form">
+            <label for="file-upload" class="icon-btn upload-btn" title="Upload Image, PDF or Word Doc">
+              <i data-lucide="paperclip"></i>
+            </label>
+            <input type="file" id="file-upload" accept="image/*,application/pdf,.docx" class="hidden">
+            <textarea id="message-input" placeholder="Message Aspire AI..." rows="1"></textarea>
+            <button type="submit" id="send-btn" class="icon-btn send-btn"><i data-lucide="send"></i></button>
+          </form>
+        </div>
+          <div class="disclaimer">Aspire AI can make mistakes. Please verify important information.</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal hidden">
+      <div class="modal-overlay" id="modal-overlay"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Settings <i data-lucide="sliders-horizontal"></i></h2>
+          <button id="close-settings" class="icon-btn"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert info">
+            <i data-lucide="shield-check"></i>
+            <p>API Key is securely loaded from Vercel Serverless environment (<code>process.env.GEMINI_API_KEY</code>). You don't need to enter an API key manually!</p>
+          </div>
+          <div class="form-group">
+            <label for="api-key">Custom Gemini API Key (Optional Override)</label>
+            <input type="password" id="api-key" placeholder="AIzaSy... (Optional override)">
+            <small>Loaded automatically from Vercel <code>process.env.GEMINI_API_KEY</code> when deployed.</small>
+          </div>
+          <div class="form-group" style="margin-top:15px;">
+            <label for="quant-api-key">Finnhub Data API Key (Optional)</label>
+            <input type="password" id="quant-api-key" placeholder="Raw data for active Prediction trackers...">
+            <small>Get a free API key from <a href="https://finnhub.io" target="_blank">Finnhub</a>.</small>
+          </div>
+          <div class="form-group">
+            <label for="system-instructions">Custom Instructions (Memory)</label>
+            <textarea id="system-instructions" rows="4" placeholder="Tell Aspire AI how you want it to behave (e.g. Always be concise, use markdown tables when comparing data, etc.)"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="save-settings" class="btn primary">Save Changes</button>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- Hidden PDF Template -->
+  <div id="pdf-template-wrapper" style="display: none;">
+    <div id="portfolio-pdf-template" class="pdf-template">
+      <!-- Header -->
+      <div class="pdf-header">
+        <div class="pdf-logo">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 22l10-4 10 4L12 2z"></path>
+          </svg>
+          <h2>Aspire AI</h2>
+        </div>
+        <div class="pdf-title">
+          <h1>Portfolio Analysis Template</h1>
+          <p id="pdf-date">Generated on: </p>
+        </div>
+      </div>
+
+      <!-- Dashboard Grid -->
+      <div class="pdf-dashboard">
+        <!-- Top Row Stats -->
+        <div class="pdf-card top-stat">
+          <span class="pdf-label">Overall Portfolio Value</span>
+          <h2 id="pdf-total-value" class="pdf-value-lg">$0.00</h2>
+        </div>
+        <div class="pdf-card top-stat">
+          <span class="pdf-label">Return Percentage</span>
+          <h2 id="pdf-return-pct" class="pdf-value-green">0.00%</h2>
+        </div>
+        <div class="pdf-card top-stat">
+          <span class="pdf-label">Current Yield</span>
+          <h2 id="pdf-yield" class="pdf-value-green">0.00%</h2>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="pdf-main-content">
+          <!-- Left Column (Stock Breakdown Table) -->
+          <div class="pdf-card pdf-table-card">
+            <h3>Asset Allocation & Analysis</h3>
+            <table class="pdf-table">
+              <thead>
+                <tr>
+                  <th>Symbol</th>
+                  <th>Market Value</th>
+                  <th>Potential</th>
+                  <th>Risk Level</th>
+                  <th>Impact/Situation</th>
+                </tr>
+              </thead>
+              <tbody id="pdf-table-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Right Column (Tips / Insights) -->
+          <div class="pdf-card pdf-insights-card">
+            <h3>Strategic Tips</h3>
+            <ul id="pdf-tips-list">
+              <!-- Dynamically populated -->
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=28"></script>
+</body>
+</html>
