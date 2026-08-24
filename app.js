@@ -28,7 +28,7 @@ const systemInstructionsInput = document.getElementById('system-instructions');
 const sendBtn = document.getElementById('send-btn');
 
 // State
-let apiKey = localStorage.getItem('aspire_api_key') || '';
+let apiKey = 'serverless';
 let quantApiKey = localStorage.getItem('aspire_quant_api_key') || '';
 let systemInstructions = localStorage.getItem('aspire_system_instructions') || '';
 let currentImageBase64 = null;
@@ -936,32 +936,12 @@ async function handleSendMessage(e) {
 
 let cachedGeminiModel = null;
 async function getBestModel() {
-  if (cachedGeminiModel) return cachedGeminiModel;
-  try {
-    const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
-    const listRes = await fetch(listUrl);
-    if(listRes.ok) {
-      const listData = await listRes.json();
-      let availableModels = (listData.models || []).map(m => m.name.split('/')[1]);
-      const flashModels = availableModels.filter(m => m.includes('flash') && !m.includes('pro'));
-      if (flashModels.includes('gemini-2.5-flash')) cachedGeminiModel = 'gemini-2.5-flash';
-      else if (flashModels.includes('gemini-2.0-flash')) cachedGeminiModel = 'gemini-2.0-flash';
-      else if (flashModels.includes('gemini-1.5-flash-latest')) cachedGeminiModel = 'gemini-1.5-flash-latest';
-      else if (flashModels.includes('gemini-1.5-flash')) cachedGeminiModel = 'gemini-1.5-flash';
-      else if (flashModels.length > 0) cachedGeminiModel = flashModels[0];
-      else cachedGeminiModel = 'gemini-1.5-flash-latest';
-    } else {
-      cachedGeminiModel = 'gemini-1.5-flash-latest';
-    }
-  } catch(e) {
-    cachedGeminiModel = 'gemini-1.5-flash-latest';
-  }
-  return cachedGeminiModel || 'gemini-1.5-flash-latest';
+    return 'gemini-1.5-flash';
 }
 
 async function callGeminiAPIStream(messages, instructions, onChunk) {
   const targetModel = await getBestModel();
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:streamGenerateContent?alt=sse&key=${apiKey}`;
+  const url = `/api/generate`;
   
   const formattedContents = messages.map(msg => {
     let parts = [];
